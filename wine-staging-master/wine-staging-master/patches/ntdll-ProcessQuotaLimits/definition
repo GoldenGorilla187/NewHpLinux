@@ -1,0 +1,1 @@
+Fixes: [44812] Multiple applications need NtQueryInformationProcess 'ProcessQuotaLimits' class support (MSYS2, ProcessHacker 2.x)

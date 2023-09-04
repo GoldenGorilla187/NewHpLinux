@@ -1,0 +1,34 @@
+From 5be4173b6c3e89b1d9267679cd392a7343088a52 Mon Sep 17 00:00:00 2001
+From: Alistair Leslie-Hughes <leslie_alistair@hotmail.com>
+Date: Tue, 8 Jun 2021 09:10:37 +1000
+Subject: [PATCH] ntdll: Avoid implicit cast of interface pointer.
+
+---
+ dlls/ntdll/unix/virtual.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/dlls/ntdll/unix/virtual.c b/dlls/ntdll/unix/virtual.c
+index 34b332a613c..111c851b43b 100644
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -3016,7 +3016,7 @@ NTSTATUS virtual_clear_tls_index( ULONG index )
+         server_enter_uninterrupted_section( &virtual_mutex, &sigset );
+         LIST_FOR_EACH_ENTRY( thread_data, &teb_list, struct ntdll_thread_data, entry )
+         {
+-            TEB *teb = CONTAINING_RECORD( thread_data, TEB, GdiTebBatch );
++            TEB *teb = CONTAINING_RECORD( (GDI_TEB_BATCH *)thread_data, TEB, GdiTebBatch );
+ #ifdef _WIN64
+             WOW_TEB *wow_teb = get_wow_teb( teb );
+             if (wow_teb) wow_teb->TlsSlots[index] = 0;
+@@ -3034,7 +3034,7 @@ NTSTATUS virtual_clear_tls_index( ULONG index )
+         server_enter_uninterrupted_section( &virtual_mutex, &sigset );
+         LIST_FOR_EACH_ENTRY( thread_data, &teb_list, struct ntdll_thread_data, entry )
+         {
+-            TEB *teb = CONTAINING_RECORD( thread_data, TEB, GdiTebBatch );
++            TEB *teb = CONTAINING_RECORD( (GDI_TEB_BATCH *)thread_data, TEB, GdiTebBatch );
+ #ifdef _WIN64
+             WOW_TEB *wow_teb = get_wow_teb( teb );
+             if (wow_teb)
+-- 
+2.30.2
+
